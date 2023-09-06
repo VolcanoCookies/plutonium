@@ -1,0 +1,26 @@
+# Comment
+
+println();
+
+print();
+
+error();
+
+fn some_function(): String {
+
+	let i = 0;
+
+	if i == 1 {
+
+	} else {
+
+	}
+
+	for i in 0..10 {
+
+	}
+
+
+
+	return "text";
+}
