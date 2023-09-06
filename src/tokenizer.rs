@@ -1,3 +1,5 @@
+use crate::token::{Token, TokenType};
+
 pub struct Tokenizer;
 
 impl Tokenizer {
@@ -15,8 +17,8 @@ impl Tokenizer {
             match iter.word() {
                 Some(word) => match word.as_str() {
                     "return" => tokens.push(Token {
-                        _type: TokenType::Return,
-                        value: None,
+                        _type: TokenType::Keyword,
+                        value: Some("return".to_string()),
                     }),
                     _ => tokens.push(Token {
                         _type: TokenType::Identifier,
@@ -47,7 +49,7 @@ impl Tokenizer {
                                     }
                                 }
                                 tokens.push(Token {
-                                    _type: TokenType::NumLiteral,
+                                    _type: TokenType::IntLiteral,
                                     value: Some(val),
                                 });
                             }
@@ -60,21 +62,6 @@ impl Tokenizer {
         }
         return tokens;
     }
-}
-
-#[derive(Debug)]
-pub enum TokenType {
-    Semi,
-    Return,
-    NumLiteral,
-    StrLiteral,
-    Identifier,
-}
-
-#[derive(Debug)]
-pub struct Token {
-    pub _type: TokenType,
-    pub value: Option<String>,
 }
 
 #[derive(Debug)]
