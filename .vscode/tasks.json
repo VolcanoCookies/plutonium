@@ -5,7 +5,7 @@
 			"type": "cargo",
 			"command": "run",
 			"args": [
-				"./test.nlo"
+				"./test.plu"
 			],
 			"problemMatcher": [
 				"$rustc"

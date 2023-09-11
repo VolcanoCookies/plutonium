@@ -1,4 +1,8 @@
-use crate::token::{Token, TokenType};
+use crate::{
+    consts::KEYWORDS,
+    operators::{BinaryOperator, BINARY_OPERATORS},
+    token::Token,
+};
 
 pub struct Tokenizer;
 
@@ -15,29 +19,20 @@ impl Tokenizer {
 
         while !iter.end() {
             match iter.word() {
-                Some(word) => match word.as_str() {
-                    "return" => tokens.push(Token {
-                        _type: TokenType::Keyword,
-                        value: Some("return".to_string()),
-                    }),
-                    _ => tokens.push(Token {
-                        _type: TokenType::Identifier,
-                        value: Some(word),
-                    }),
-                },
+                Some(word) => {
+                    if KEYWORDS.contains(&word.as_str()) {
+                        tokens.push(Token::Keyword(word));
+                    } else {
+                        tokens.push(Token::Identifier(word));
+                    }
+                }
                 None => {
                     match iter.curr() {
                         Some('"') => {
-                            tokens.push(Token {
-                                _type: TokenType::StrLiteral,
-                                value: Some(iter.until('"')),
-                            });
+                            tokens.push(Token::StrLiteral(iter.until('"')));
                         }
                         Some(';') => {
-                            tokens.push(Token {
-                                _type: TokenType::Semi,
-                                value: None,
-                            });
+                            tokens.push(Token::Semi);
                         }
                         Some(d) => {
                             if d.is_digit(10) {
@@ -48,10 +43,17 @@ impl Tokenizer {
                                         val.push(next);
                                     }
                                 }
-                                tokens.push(Token {
-                                    _type: TokenType::IntLiteral,
-                                    value: Some(val),
-                                });
+                                tokens.push(Token::IntLiteral(val));
+                            } else {
+                                for bin in BINARY_OPERATORS {
+                                    if iter.match_skip(bin.op) {
+                                        tokens.push(Token::Binary(BinaryOperator {
+                                            op: bin.op,
+                                            precedence: bin.precedence,
+                                        }));
+                                        break;
+                                    }
+                                }
                             }
                         }
                         None => panic!("Unknown char at {}", iter.i),
@@ -124,6 +126,15 @@ impl TokenizerIterator {
             }
         }
         return true;
+    }
+
+    pub fn match_skip(&mut self, str: &str) -> bool {
+        if self.matches(str) {
+            self.i += str.len();
+            self.s = self.i;
+            return true;
+        }
+        return false;
     }
 
     pub fn skip_whitespace(&mut self) {
